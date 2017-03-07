@@ -13,11 +13,8 @@ class App extends Component {
       <div className="App">
         <div className="App-header">
           <img src={logo} className="App-logo" alt="logo" />
-          <h2>Welcome to React</h2>
+          <h2>Welcome to Pizza Cabin Inc. Stand-up scheduler</h2>
         </div>
-        <p className="App-intro">
-          To get started, edit <code>src/App.js</code> and save to reload.
-        </p>
         <ul style={{listStyle: "none"}}>
           {this.props.data.ScheduleResult.Schedules.map((item, i) => 
             <li style={{fontWeight: "700"}} key={`item-${i}`}>
@@ -25,7 +22,6 @@ class App extends Component {
               <ul style={{listStyle: "none"}}>
                 {item.Projection.map((proj, index) => 
                   <li style={{fontWeight: "100"}} key={`proj-${i}-${index}`}>
-
                     <Bar proj={proj} person={item} />
                   </li>
                 )}
