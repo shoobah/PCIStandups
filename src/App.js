@@ -1,5 +1,4 @@
 import React, {Component} from "react";
-import logo from "./logo.svg";
 import Moment from "moment";
 import Scheme from "./Scheme";
 import Bar from "./Bar";
@@ -8,6 +7,11 @@ import "./App.css";
 Moment.locale("sv");
 
 class App extends Component {
+  constructor(props) {
+    super(props);
+    this.availableCount = 0;
+  }
+  //Hämta aktivitet för en viss tid
   getActivity = (projection, time) => {
     const m = Moment(time);
     const activeProj = projection.filter(val => {
@@ -19,34 +23,36 @@ class App extends Component {
     return activeProj && activeProj.Description ? activeProj.Description : null;
   };
 
+  //Kolla om aktiviteten är en tillgänglig aktivitet
   isAnAvilableActivity(activity) {
-    if (activity && (activity !== "Lunch" || activity !== "Short break"))
-      return true;
-
-    return false;
+    if (activity === null || activity === "Lunch" || activity === "Short break")
+      return false;
+    return true;
   }
 
+  //Kolla om en person är tillgänglig vid en viss tid
   isAvailable = (person, time) => {
     const act = this.getActivity(person.Projection, time);
-    console.log("person.Name", person.Name);
-
-    console.log("act", this.isAnAvilableActivity(act));
     return this.isAnAvilableActivity(act);
+  };
+
+  addAvaliability = () => {
+    this.availableCount += 1;
+    console.log("this.availableCount", this.availableCount);
   };
 
   render() {
     const data = this.props.data.ScheduleResult.Schedules.filter(
       person => person.ContractTimeMinutes > 0
     );
-    const searchTime = "2015-12-14 11:45";
+    const searchTime = "2015-12-14 14:15";
     return (
       <div className="App">
         <div className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
           <h2>Welcome to Pizza Cabin Inc. Stand-up scheduler</h2>
           <h3>{searchTime}</h3>
         </div>
-        <ul style={{listStyle: "none", position: "relative"}}>
+        <ul className="MainList">
           {data.map(
             (person, i) => person.ContractTimeMinutes > 0
               ? <Scheme
@@ -54,6 +60,8 @@ class App extends Component {
                   person={person}
                   key={`scheme-${i}`}
                   index={i}
+                  searchTime={searchTime}
+                  adder={this.addAvaliability}
                 >
                   {person.Projection.map((projection, index) => 
                     <Bar

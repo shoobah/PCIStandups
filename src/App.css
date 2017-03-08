@@ -18,7 +18,20 @@
   font-size: large;
 }
 
+.MainList {
+  list-style: none;
+  position: relative
+}
+
+.Scheme {
+  position: relative;
+}
+
 @keyframes App-logo-spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
