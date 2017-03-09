@@ -16,7 +16,7 @@ class App extends Component {
         super(props);
         this.availableCount = 0;
         this.meetingLength = 15;
-        this.startTime = new Moment('2015-12-14T09:00');
+        this.startTime = new Moment(props.startTime);
         this.data = [];
         this.state = {
             searchTime: this.startTime,

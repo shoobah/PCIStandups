@@ -8,4 +8,4 @@ injectTapEventPlugin();
 
 const data = require('./testdata/TestData.json');
 
-ReactDOM.render(<App data={data} />, document.getElementById('root'));
+ReactDOM.render(<App data={data} startTime={'2015-12-14T09:00'} />, document.getElementById('root'));
