@@ -94,7 +94,6 @@ class App extends Component {
         this.checkAvilability(this.startTime);
         this.setState({
             searchTime: this.startTime,
-            currentFree: 0,
             setValue: 0
         });
     };
@@ -117,7 +116,8 @@ class App extends Component {
                     />
                     <Toolbar>
                         <ToolbarGroup firstChild>
-                            <RaisedButton label="Reset" primary onTouchTap={this.resetAll.bind(this)} />
+                            <RaisedButton label="Reset" onTouchTap={this.resetAll.bind(this)} />
+                            <RaisedButton label="Nästa lämpliga tid" primary />
                         </ToolbarGroup>
                     </Toolbar>
 
