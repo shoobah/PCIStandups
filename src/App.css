@@ -27,6 +27,19 @@
   position: relative;
 }
 
+.Controls {
+  font-size: 2rem;
+}
+
+.Clickable {
+  cursor: pointer;
+  user-select: none;
+}
+
+.Clickable:hover {
+  background-color: #EEE;
+}
+
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);
