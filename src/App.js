@@ -10,18 +10,27 @@ class App extends Component {
     constructor(props) {
         super(props);
         this.availableCount = 0;
+        this.meetingLength = 15;
         this.startTime = new Moment('2015-12-14T09:00');
+        this.data = [];
         this.state = {
-            searchTime: this.startTime
+            searchTime: this.startTime,
+            currentFree: 0
         };
     }
+
+    componentWillMount() {
+        this.data = this.props.data.ScheduleResult.Schedules.filter(person => person.ContractTimeMinutes > 0);
+        this.checkAvilability(this.startTime);
+    }
+
     //Hämta aktivitet för en viss tid
-    getActivity = (projection, time) => {
+    getActivity = (projection, time, inclusion = '[)') => {
         const m = time;
         const activeProj = projection.filter(val => {
             const t1 = Moment(val.Start);
             const t2 = Moment(t1).add(val.minutes, 'minutes');
-            const between = m.isBetween(t1, t2, 'seconds', '[)');
+            const between = m.isBetween(t1, t2, 'seconds', inclusion);
             return between;
         })[0];
         return activeProj && activeProj.Description ? activeProj.Description : null;
@@ -35,34 +44,42 @@ class App extends Component {
 
     //Kolla om en person är tillgänglig vid en viss tid
     isAvailable = (person, time) => {
-        const act = this.getActivity(person.Projection, time);
-        return this.isAnAvilableActivity(act);
+        const act1 = this.getActivity(person.Projection, time);
+        const act2 = this.getActivity(person.Projection, Moment(time).add(this.meetingLength, 'minutes'), '[]');
+        return this.isAnAvilableActivity(act1) && this.isAnAvilableActivity(act2);
     };
 
-    addAvaliability = () => {
-        this.availableCount += 1;
+    checkAvilability = time => {
+        let count = 0;
+        this.data.map((person, index) => {
+            if (this.isAvailable(person, time)) count += 1;
+        });
+        this.setState({
+            currentFree: count
+        });
     };
 
     increaseTime = () => {
-        const newTime = this.state.searchTime.add(15, 'minutes');
+        const newTime = Moment(this.state.searchTime).add(15, 'minutes');
         this.availableCount = 0;
         this.setState({
             searchTime: newTime
         });
+        this.checkAvilability(newTime);
     };
 
     decreaseTime = () => {
-        const newTime = this.state.searchTime.subtract(15, 'minutes');
-        this.availableCount = 0;
-        this.setState({
-            searchTime: newTime
-        });
+        const newTime = Moment(this.state.searchTime).subtract(15, 'minutes');
+        if (newTime.isSameOrAfter(this.startTime)) {
+            this.availableCount = 0;
+            this.setState({
+                searchTime: newTime
+            });
+            this.checkAvilability(newTime);
+        }
     };
 
     render() {
-        const data = this.props.data.ScheduleResult.Schedules.filter(person => person.ContractTimeMinutes > 0);
-        console.log('this.state.searchTime', this.state.searchTime.format('LLL'));
-
         return (
             <div className="App">
                 <div className="App-header">
@@ -73,16 +90,16 @@ class App extends Component {
                     <span className="Clickable" onClick={this.decreaseTime.bind(this)}>«</span>
                     <span className="Clickable" onClick={this.increaseTime.bind(this)}>»</span>
                 </div>
+                <div>{this.state.currentFree}</div>
                 <ul className="MainList">
-                    {data.map(
+                    {this.data.map(
                         (person, i) => person.ContractTimeMinutes > 0
                             ? <Scheme
                                   isAvailable={this.isAvailable(person, this.state.searchTime)}
                                   person={person}
                                   key={`scheme-${i}`}
                                   index={i}
-                                  searchTime={this.state.searchTime.format('LLL')}
-                                  adder={this.addAvaliability}
+                                  searchTime={this.state.searchTime}
                               >
                                   {person.Projection.map((projection, index) => (
                                       <Bar
