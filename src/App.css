@@ -28,7 +28,11 @@
 }
 
 .Controls {
+  position: relative;
   font-size: 2rem;
+  width: 50%;
+  left: 50%;
+  transform: translateX(-50%)
 }
 
 .Clickable {

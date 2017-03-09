@@ -2,6 +2,11 @@ import React, {Component} from 'react';
 import Moment from 'moment';
 import Scheme from './Scheme';
 import Bar from './Bar';
+import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+import AppBar from 'material-ui/AppBar';
+import Slider from 'material-ui/Slider';
+import {Toolbar, ToolbarGroup} from 'material-ui/Toolbar';
+import RaisedButton from 'material-ui/RaisedButton';
 import './App.css';
 
 Moment.locale('sv');
@@ -15,7 +20,8 @@ class App extends Component {
         this.data = [];
         this.state = {
             searchTime: this.startTime,
-            currentFree: 0
+            currentFree: 0,
+            setValue: 0
         };
     }
 
@@ -51,12 +57,13 @@ class App extends Component {
 
     checkAvilability = time => {
         let count = 0;
-        this.data.map((person, index) => {
+        this.data.forEach((person, index) => {
             if (this.isAvailable(person, time)) count += 1;
         });
         this.setState({
             currentFree: count
         });
+        return;
     };
 
     increaseTime = () => {
@@ -66,6 +73,7 @@ class App extends Component {
             searchTime: newTime
         });
         this.checkAvilability(newTime);
+        return;
     };
 
     decreaseTime = () => {
@@ -77,43 +85,76 @@ class App extends Component {
             });
             this.checkAvilability(newTime);
         }
+        return;
     };
+
+    resetAll = () => {
+        this.startTime = new Moment('2015-12-14T09:00');
+        this.data = this.props.data.ScheduleResult.Schedules.filter(person => person.ContractTimeMinutes > 0);
+        this.checkAvilability(this.startTime);
+        this.setState({
+            searchTime: this.startTime,
+            currentFree: 0,
+            setValue: 0
+        });
+    };
+
+    changeTime(e, minutes) {
+        const newTime = Moment(this.startTime).add(minutes, 'minutes');
+        this.setState({
+            searchTime: newTime
+        });
+        this.checkAvilability(newTime);
+    }
 
     render() {
         return (
-            <div className="App">
-                <div className="App-header">
-                    <h2>Welcome to Pizza Cabin Inc. Stand-up scheduler</h2>
-                    <h3>{this.state.searchTime.format('LLL')}</h3>
+            <MuiThemeProvider>
+                <div className="App">
+                    <AppBar
+                        title={`${this.state.searchTime.format('LLL')} - ${this.state.currentFree} lediga.`}
+                        showMenuIconButton={false}
+                    />
+                    <Toolbar>
+                        <ToolbarGroup firstChild>
+                            <RaisedButton label="Reset" primary onTouchTap={this.resetAll.bind(this)} />
+                        </ToolbarGroup>
+                    </Toolbar>
+
+                    <div className="Controls">
+                        <Slider
+                            defaultValue={0}
+                            min={0}
+                            max={705}
+                            step={15}
+                            value={this.state.setValue}
+                            onChange={this.changeTime.bind(this)}
+                        />
+                    </div>
+                    <ul className="MainList">
+                        {this.data.map(
+                            (person, i) => person.ContractTimeMinutes > 0
+                                ? <Scheme
+                                      isAvailable={this.isAvailable(person, this.state.searchTime)}
+                                      person={person}
+                                      key={`scheme-${i}`}
+                                      index={i}
+                                      searchTime={this.state.searchTime}
+                                  >
+                                      {person.Projection.map((projection, index) => (
+                                          <Bar
+                                              key={`projection-${i}-${index}`}
+                                              projection={projection}
+                                              person={person}
+                                              index={index}
+                                          />
+                                      ))}
+                                  </Scheme>
+                                : null
+                        )}
+                    </ul>
                 </div>
-                <div className="Controls">
-                    <span className="Clickable" onClick={this.decreaseTime.bind(this)}>«</span>
-                    <span className="Clickable" onClick={this.increaseTime.bind(this)}>»</span>
-                </div>
-                <div>{this.state.currentFree}</div>
-                <ul className="MainList">
-                    {this.data.map(
-                        (person, i) => person.ContractTimeMinutes > 0
-                            ? <Scheme
-                                  isAvailable={this.isAvailable(person, this.state.searchTime)}
-                                  person={person}
-                                  key={`scheme-${i}`}
-                                  index={i}
-                                  searchTime={this.state.searchTime}
-                              >
-                                  {person.Projection.map((projection, index) => (
-                                      <Bar
-                                          key={`projection-${i}-${index}`}
-                                          projection={projection}
-                                          person={person}
-                                          index={index}
-                                      />
-                                  ))}
-                              </Scheme>
-                            : null
-                    )}
-                </ul>
-            </div>
+            </MuiThemeProvider>
         );
     }
 }
