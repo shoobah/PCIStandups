@@ -62,7 +62,7 @@ class App extends Component {
         this.setState({
             currentFree: count
         });
-        return;
+        return count;
     };
 
     increaseTime = () => {
@@ -105,7 +105,22 @@ class App extends Component {
         this.checkAvilability(newTime);
     }
 
-    seekTime() {}
+    seekTime() {
+        const startAt = Moment(this.startTime);
+        let offset = 0;
+        const step = 15;
+        let possibleTimes = [];
+        while (offset <= 700) {
+            const time = startAt.add(step, 'minutes');
+            offset += step;
+            this.data.forEach((person, index) => {
+                possibleTimes.push({
+                    time,
+                    count: checkAvilability(time)
+                });
+            });
+        }
+    }
 
     render() {
         return (
