@@ -1,25 +1,26 @@
-import React, {Component} from 'react';
+import React from 'react';
 import Moment from 'moment';
+import Marker from './Marker';
+import Bar from './Bar';
 
-class Scheme extends Component {
-    render() {
-        const start = this.props.searchTime.diff(Moment(this.props.person.Date), 'm');
-        return (
-            <div className="Scheme" style={{top: this.props.index * 50 + 'px'}}>
-                {this.props.children}
-                <div
-                    style={{
-                        position: 'absolute',
-                        left: start - 481 + 'px',
-                        width: '15px',
-                        height: '40px',
-                        backgroundColor: this.props.isAvailable ? 'lime' : 'red',
-                        zIndex: 1000
-                    }}
+const Scheme = props => {
+    const start = props.searchTime.diff(Moment(props.person.Date), 'm');
+    const offset = 200;
+    return (
+        <div className="Scheme" style={{top: props.index * 50 + 'px'}}>
+            <span className="SchemeLabel">{props.person.Name}</span>
+            {props.person.Projection.map((projection, index) => (
+                <Bar
+                    key={`projection-${props.person.Name}-${index}`}
+                    projection={projection}
+                    person={props.person}
+                    index={index}
+                    offset={offset}
                 />
-            </div>
-        );
-    }
-}
+            ))}
+            <Marker start={start} isAvailable={props.isAvailable} offset={offset} />
+        </div>
+    );
+};
 
 export default Scheme;

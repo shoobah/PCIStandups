@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
 import Moment from 'moment';
 import Scheme from './Scheme';
-import Bar from './Bar';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import AppBar from 'material-ui/AppBar';
 import Slider from 'material-ui/Slider';
@@ -133,24 +132,16 @@ class App extends Component {
                     </div>
                     <ul className="MainList">
                         {this.data.map(
-                            (person, i) => person.ContractTimeMinutes > 0
-                                ? <Scheme
-                                      isAvailable={this.isAvailable(person, this.state.searchTime)}
-                                      person={person}
-                                      key={`scheme-${i}`}
-                                      index={i}
-                                      searchTime={this.state.searchTime}
-                                  >
-                                      {person.Projection.map((projection, index) => (
-                                          <Bar
-                                              key={`projection-${i}-${index}`}
-                                              projection={projection}
-                                              person={person}
-                                              index={index}
-                                          />
-                                      ))}
-                                  </Scheme>
-                                : null
+                            (person, i) =>
+                                person.ContractTimeMinutes > 0
+                                    ? <Scheme
+                                          isAvailable={this.isAvailable(person, this.state.searchTime)}
+                                          person={person}
+                                          key={`scheme-${i}`}
+                                          index={i}
+                                          searchTime={this.state.searchTime}
+                                      />
+                                    : null
                         )}
                     </ul>
                 </div>

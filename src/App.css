@@ -35,13 +35,11 @@
   transform: translateX(-50%)
 }
 
-.Clickable {
-  cursor: pointer;
-  user-select: none;
-}
-
-.Clickable:hover {
-  background-color: #EEE;
+.SchemeLabel{
+  position: absolute;
+  left: 10px;
+  z-index: 100000;
+  line-height: 38px;
 }
 
 @keyframes App-logo-spin {

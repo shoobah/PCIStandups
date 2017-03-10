@@ -8,7 +8,7 @@ const Bar = props => {
 
     const style = {
         position: 'absolute',
-        left: start - 480 + 'px',
+        left: props.offset + start - 480 + 'px',
         width: length + 'px',
         height: '40px',
         backgroundColor: color
