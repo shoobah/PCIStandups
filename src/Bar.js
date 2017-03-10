@@ -13,11 +13,7 @@ const Bar = props => {
         height: '40px',
         backgroundColor: color
     };
-    return <div style={style}>&nbsp;</div>;
+    return <div style={style}>{length > 30 ? props.projection.Description : ''}</div>;
 };
 
 export default Bar;
-//   [{start}]
-//   {props.projection.Description}
-//   {Moment(props.projection.Start).format("LLL")}
-//   {Moment.duration(props.projection.minutes, "minutes").humanize()}

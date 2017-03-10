@@ -113,13 +113,21 @@ class App extends Component {
         while (offset <= 700) {
             const time = startAt.add(step, 'minutes');
             offset += step;
-            this.data.forEach((person, index) => {
-                possibleTimes.push({
-                    time,
-                    count: checkAvilability(time)
-                });
-            });
+            let info = {
+                time,
+                count: this.checkAvilability(time)
+            };
+            console.log('time', info.time.format('LLL'));
+            console.log('count', info.count);
+            possibleTimes.push(info);
         }
+        possibleTimes.sort((a, b) => {
+            if (a.count > b.count) return -1;
+            if (a.count < b.count) return 1;
+            return 0;
+        });
+
+        console.log('possibleTimes', possibleTimes);
     }
 
     render() {
