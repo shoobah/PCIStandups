@@ -88,7 +88,7 @@ class App extends Component {
     };
 
     resetAll = () => {
-        this.startTime = new Moment('2015-12-14T09:00');
+        this.startTime = new Moment(this.props.startTime);
         this.data = this.props.data.ScheduleResult.Schedules.filter(person => person.ContractTimeMinutes > 0);
         this.checkAvilability(this.startTime);
         this.setState({
@@ -105,6 +105,8 @@ class App extends Component {
         this.checkAvilability(newTime);
     }
 
+    seekTime() {}
+
     render() {
         return (
             <MuiThemeProvider>
@@ -116,7 +118,9 @@ class App extends Component {
                     <Toolbar>
                         <ToolbarGroup firstChild>
                             <RaisedButton label="Reset" onTouchTap={this.resetAll.bind(this)} />
-                            <RaisedButton label="Nästa lämpliga tid" primary />
+                            <RaisedButton label="Nästa lämpliga tid" onTouchTap={this.seekTime.bind(this)} primary />
+                            <RaisedButton label="Boka rum" />
+                            <RaisedButton label="Välj team" />
                         </ToolbarGroup>
                     </Toolbar>
 
