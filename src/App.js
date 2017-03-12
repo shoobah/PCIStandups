@@ -4,6 +4,7 @@ import Scheme from './Scheme';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import AppBar from 'material-ui/AppBar';
 import Slider from 'material-ui/Slider';
+import TextField from 'material-ui/TextField';
 import {Toolbar, ToolbarGroup} from 'material-ui/Toolbar';
 import RaisedButton from 'material-ui/RaisedButton';
 import './App.css';
@@ -16,17 +17,23 @@ class App extends Component {
         this.availableCount = 0;
         this.meetingLength = 15;
         this.startTime = new Moment(props.startTime);
+        this.possibleTimes = [];
+        this.currentPossible = 0;
+        this.minParticipants = 0;
         this.data = [];
         this.state = {
             searchTime: this.startTime,
             currentFree: 0,
-            setValue: 0
+            setValue: 0,
+            errorMessage: ''
         };
     }
 
     componentWillMount() {
         this.data = this.props.data.ScheduleResult.Schedules.filter(person => person.ContractTimeMinutes > 0);
+        this.minParticipants = this.data.length;
         this.checkAvilability(this.startTime);
+        this.seekTime();
     }
 
     //Hämta aktivitet för en viss tid
@@ -109,25 +116,78 @@ class App extends Component {
         const startAt = Moment(this.startTime);
         let offset = 0;
         const step = 15;
-        let possibleTimes = [];
+        this.possibleTimes = [];
         while (offset <= 700) {
-            const time = startAt.add(step, 'minutes');
+            const time = Moment(startAt).add(offset, 'minutes');
             offset += step;
             let info = {
                 time,
                 count: this.checkAvilability(time)
             };
-            console.log('time', info.time.format('LLL'));
-            console.log('count', info.count);
-            possibleTimes.push(info);
+            this.possibleTimes.push(info);
         }
-        possibleTimes.sort((a, b) => {
+        this.possibleTimes.sort((a, b) => {
             if (a.count > b.count) return -1;
             if (a.count < b.count) return 1;
+            if (a.count === b.count && a.time.isSameOrBefore(b.time)) return -1;
+            if (a.count === b.count && a.time.isAfter(b.time)) return 1;
             return 0;
         });
+        this.possibleTimes = this.possibleTimes.filter(value => value.count >= this.minParticipants);
+        console.log('this.possibleTimes', this.possibleTimes);
 
-        console.log('possibleTimes', possibleTimes);
+        this.currentPossible = 0;
+    }
+
+    nextPossibleTime() {
+        this.setState({
+            searchTime: this.possibleTimes[this.currentPossible].time,
+            currentFree: this.possibleTimes[this.currentPossible].count
+        });
+        this.currentPossible += 1;
+        if (this.currentPossible >= this.possibleTimes.length) this.currentPossible = 0;
+    }
+
+    prevPossibleTime() {
+        this.setState({
+            searchTime: this.possibleTimes[this.currentPossible].time,
+            currentFree: this.possibleTimes[this.currentPossible].count
+        });
+        this.currentPossible -= 1;
+        if (this.currentPossible < 0) this.currentPossible = this.possibleTimes.length - 1;
+    }
+
+    filterOnNumber(e, val) {
+        if (!val) {
+            this.setState({
+                errorMessage: ''
+            });
+            return;
+        }
+        let n = parseInt(val, 10);
+        if (!n || n < 0) {
+            this.setState({
+                errorMessage: 'Inte ett tal!'
+            });
+            return;
+        }
+        if (n > this.data.length) {
+            this.setState({
+                errorMessage: 'För många deltagare max ' + this.data.length
+            });
+            return;
+        }
+        this.setState({
+            errorMessage: ''
+        });
+        this.minParticipants = n;
+        this.seekTime();
+        if (this.possibleTimes && this.possibleTimes.length > 0) {
+            this.setState({
+                searchTime: this.possibleTimes[0].time,
+                currentFree: this.possibleTimes[0].count
+            });
+        }
     }
 
     render() {
@@ -141,9 +201,21 @@ class App extends Component {
                     <Toolbar>
                         <ToolbarGroup firstChild>
                             <RaisedButton label="Reset" onTouchTap={this.resetAll.bind(this)} />
-                            <RaisedButton label="Nästa lämpliga tid" onTouchTap={this.seekTime.bind(this)} primary />
-                            <RaisedButton label="Boka rum" />
-                            <RaisedButton label="Välj team" />
+                            <RaisedButton
+                                label="Föreg. lämpliga tid"
+                                onTouchTap={this.prevPossibleTime.bind(this)}
+                                primary
+                            />
+                            <RaisedButton
+                                label="Nästa lämpliga tid"
+                                onTouchTap={this.nextPossibleTime.bind(this)}
+                                primary
+                            />
+                            <TextField
+                                hintText={'Minst antal deltagare'}
+                                errorText={this.state.errorMessage}
+                                onChange={this.filterOnNumber.bind(this)}
+                            />
                         </ToolbarGroup>
                     </Toolbar>
 

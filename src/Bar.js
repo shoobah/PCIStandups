@@ -11,7 +11,8 @@ const Bar = props => {
         left: props.offset + start - 480 + 'px',
         width: length + 'px',
         height: '40px',
-        backgroundColor: color
+        backgroundColor: color,
+        lineHeight: '35px'
     };
     return <div style={style}>{length > 30 ? props.projection.Description : ''}</div>;
 };
