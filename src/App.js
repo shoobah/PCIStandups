@@ -19,10 +19,10 @@ class App extends Component {
         this.startTime = new Moment(props.startTime);
         this.possibleTimes = [];
         this.currentPossible = 0;
-        this.minParticipants = 0;
         this.data = [];
         this.state = {
             searchTime: this.startTime,
+            minParticipants: 0,
             currentFree: 0,
             setValue: 0,
             errorMessage: ''
@@ -31,7 +31,9 @@ class App extends Component {
 
     componentWillMount() {
         this.data = this.props.data.ScheduleResult.Schedules.filter(person => person.ContractTimeMinutes > 0);
-        this.minParticipants = this.data.length;
+        this.setState({
+            minParticipants: this.data.length
+        });
         this.checkAvilability(this.startTime);
         this.seekTime();
     }
@@ -100,8 +102,12 @@ class App extends Component {
         this.checkAvilability(this.startTime);
         this.setState({
             searchTime: this.startTime,
-            setValue: 0
+            minParticipants: this.data.length,
+            currentFree: 0,
+            setValue: 0,
+            errorMessage: ''
         });
+        this.seekTime(this.state.minParticipants);
     };
 
     changeTime(e, minutes) {
@@ -112,7 +118,7 @@ class App extends Component {
         this.checkAvilability(newTime);
     }
 
-    seekTime() {
+    seekTime(minParticipants) {
         const startAt = Moment(this.startTime);
         let offset = 0;
         const step = 15;
@@ -131,14 +137,15 @@ class App extends Component {
             if (a.time.isAfter(b.time)) return 1;
             return 0;
         });
-        this.possibleTimes = this.possibleTimes.filter(value => value.count >= this.minParticipants);
+        this.possibleTimes = this.possibleTimes.filter(value => value.count >= minParticipants);
         this.currentPossible = 0;
     }
 
     nextPossibleTime() {
         this.setState({
             searchTime: this.possibleTimes[this.currentPossible].time,
-            currentFree: this.possibleTimes[this.currentPossible].count
+            currentFree: this.possibleTimes[this.currentPossible].count,
+            setValue: this.possibleTimes[this.currentPossible].time.diff(this.startTime, 'minutes')
         });
         this.currentPossible += 1;
         if (this.currentPossible >= this.possibleTimes.length) this.currentPossible = 0;
@@ -147,13 +154,17 @@ class App extends Component {
     prevPossibleTime() {
         this.setState({
             searchTime: this.possibleTimes[this.currentPossible].time,
-            currentFree: this.possibleTimes[this.currentPossible].count
+            currentFree: this.possibleTimes[this.currentPossible].count,
+            setValue: this.possibleTimes[this.currentPossible].time.diff(this.startTime, 'minutes')
         });
         this.currentPossible -= 1;
         if (this.currentPossible < 0) this.currentPossible = this.possibleTimes.length - 1;
     }
 
     filterOnNumber(e, val) {
+        this.setState({
+            minParticipants: e.target.value
+        });
         if (!val) {
             this.setState({
                 errorMessage: ''
@@ -176,10 +187,10 @@ class App extends Component {
         this.setState({
             errorMessage: ''
         });
-        this.minParticipants = n;
-        this.seekTime();
+        this.seekTime(n);
         if (this.possibleTimes && this.possibleTimes.length > 0) {
             this.setState({
+                minParticipants: n,
                 searchTime: this.possibleTimes[0].time,
                 currentFree: this.possibleTimes[0].count
             });
@@ -208,23 +219,23 @@ class App extends Component {
                                 primary
                             />
                             <TextField
+                                style={{width: '100px'}}
                                 hintText={'Minst antal deltagare'}
                                 errorText={this.state.errorMessage}
                                 onChange={this.filterOnNumber.bind(this)}
+                                value={this.state.minParticipants}
+                            />
+                            <Slider
+                                defaultValue={0}
+                                min={0}
+                                max={705}
+                                step={15}
+                                style={{width: '300px'}}
+                                value={this.state.setValue}
+                                onChange={this.changeTime.bind(this)}
                             />
                         </ToolbarGroup>
                     </Toolbar>
-
-                    <div className="Controls">
-                        <Slider
-                            defaultValue={0}
-                            min={0}
-                            max={705}
-                            step={15}
-                            value={this.state.setValue}
-                            onChange={this.changeTime.bind(this)}
-                        />
-                    </div>
                     <ul className="MainList">
                         {this.data.map(
                             (person, i) =>
