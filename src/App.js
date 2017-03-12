@@ -127,15 +127,11 @@ class App extends Component {
             this.possibleTimes.push(info);
         }
         this.possibleTimes.sort((a, b) => {
-            if (a.count > b.count) return -1;
-            if (a.count < b.count) return 1;
-            if (a.count === b.count && a.time.isSameOrBefore(b.time)) return -1;
-            if (a.count === b.count && a.time.isAfter(b.time)) return 1;
+            if (a.time.isSameOrBefore(b.time)) return -1;
+            if (a.time.isAfter(b.time)) return 1;
             return 0;
         });
         this.possibleTimes = this.possibleTimes.filter(value => value.count >= this.minParticipants);
-        console.log('this.possibleTimes', this.possibleTimes);
-
         this.currentPossible = 0;
     }
 
@@ -165,7 +161,7 @@ class App extends Component {
             return;
         }
         let n = parseInt(val, 10);
-        if (!n || n < 0) {
+        if (isNaN(n)) {
             this.setState({
                 errorMessage: 'Inte ett tal!'
             });

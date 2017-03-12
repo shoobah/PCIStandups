@@ -12,7 +12,8 @@ const Bar = props => {
         width: length + 'px',
         height: '40px',
         backgroundColor: color,
-        lineHeight: '35px'
+        lineHeight: '35px',
+        borderRadius: '5px'
     };
     return <div style={style}>{length > 30 ? props.projection.Description : ''}</div>;
 };
