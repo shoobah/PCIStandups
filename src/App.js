@@ -28,15 +28,11 @@ class App extends Component {
 
     componentWillMount() {
         this.data = this.props.data.ScheduleResult.Schedules.filter(person => person.ContractTimeMinutes > 0);
-        this.setState({
-            minParticipants: this.data.length
-        });
-        this.checkAvilability(this.startTime);
-        this.seekTime();
+        this.resetAll();
     }
 
     //Hämta aktivitet för en viss tid
-    getActivity = (projection, time, inclusion = '[)') => {
+    getActivity(projection, time, inclusion = '[)') {
         const m = time;
         const activeProj = projection.filter(val => {
             const t1 = Moment(val.Start);
@@ -45,13 +41,27 @@ class App extends Component {
             return between;
         })[0];
         return activeProj && activeProj.Description ? activeProj.Description : null;
+    }
+
+    resetAll = () => {
+        this.startTime = new Moment(this.props.startTime);
+        this.data = this.props.data.ScheduleResult.Schedules.filter(person => person.ContractTimeMinutes > 0);
+        this.checkAvilability(this.startTime);
+        this.setState({
+            searchTime: this.startTime,
+            minParticipants: this.data.length,
+            currentFree: 0,
+            setValue: 0,
+            errorMessage: ''
+        });
+        this.seekTime(this.state.minParticipants);
     };
 
     //Kolla om aktiviteten är en tillgänglig aktivitet
-    isAnAvilableActivity(activity) {
+    isAnAvilableActivity = activity => {
         if (activity === null || activity === 'Lunch' || activity === 'Short break') return false;
         return true;
-    }
+    };
 
     //Kolla om en person är tillgänglig vid en viss tid
     isAvailable = (person, time) => {
@@ -93,29 +103,15 @@ class App extends Component {
         return;
     };
 
-    resetAll = () => {
-        this.startTime = new Moment(this.props.startTime);
-        this.data = this.props.data.ScheduleResult.Schedules.filter(person => person.ContractTimeMinutes > 0);
-        this.checkAvilability(this.startTime);
-        this.setState({
-            searchTime: this.startTime,
-            minParticipants: this.data.length,
-            currentFree: 0,
-            setValue: 0,
-            errorMessage: ''
-        });
-        this.seekTime(this.state.minParticipants);
-    };
-
-    changeTime(e, minutes) {
+    changeTime = (e, minutes) => {
         const newTime = Moment(this.startTime).add(minutes, 'minutes');
         this.setState({
             searchTime: newTime
         });
         this.checkAvilability(newTime);
-    }
+    };
 
-    seekTime(minParticipants) {
+    seekTime = minParticipants => {
         const startAt = Moment(this.startTime);
         let offset = 0;
         const step = 15;
@@ -136,9 +132,9 @@ class App extends Component {
         });
         this.possibleTimes = this.possibleTimes.filter(value => value.count >= minParticipants);
         this.currentPossible = 0;
-    }
+    };
 
-    nextPossibleTime() {
+    nextPossibleTime = () => {
         this.setState({
             searchTime: this.possibleTimes[this.currentPossible].time,
             currentFree: this.possibleTimes[this.currentPossible].count,
@@ -146,9 +142,9 @@ class App extends Component {
         });
         this.currentPossible += 1;
         if (this.currentPossible >= this.possibleTimes.length) this.currentPossible = 0;
-    }
+    };
 
-    prevPossibleTime() {
+    prevPossibleTime = () => {
         this.setState({
             searchTime: this.possibleTimes[this.currentPossible].time,
             currentFree: this.possibleTimes[this.currentPossible].count,
@@ -156,9 +152,9 @@ class App extends Component {
         });
         this.currentPossible -= 1;
         if (this.currentPossible < 0) this.currentPossible = this.possibleTimes.length - 1;
-    }
+    };
 
-    filterOnNumber(e, val) {
+    filterOnNumber = (e, val) => {
         this.setState({
             minParticipants: e.target.value
         });
@@ -192,7 +188,7 @@ class App extends Component {
                 currentFree: this.possibleTimes[0].count
             });
         }
-    }
+    };
 
     render() {
         return (
