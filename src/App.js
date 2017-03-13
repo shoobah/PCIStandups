@@ -207,6 +207,7 @@ class App extends Component {
                         errorMessage={this.state.errorMessage}
                         prevPossibleTime={this.prevPossibleTime}
                         nextPossibleTime={this.nextPossibleTime}
+                        changeTime={this.changeTime}
                         filterOnNumber={this.filterOnNumber}
                         resetAll={this.resetAll}
                     />
