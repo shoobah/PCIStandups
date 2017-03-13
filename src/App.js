@@ -3,10 +3,7 @@ import Moment from 'moment';
 import Scheme from './Scheme';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import AppBar from 'material-ui/AppBar';
-import Slider from 'material-ui/Slider';
-import TextField from 'material-ui/TextField';
-import {Toolbar, ToolbarGroup} from 'material-ui/Toolbar';
-import RaisedButton from 'material-ui/RaisedButton';
+import MyToolbar from './MyToolbar';
 import './App.css';
 
 Moment.locale('sv');
@@ -205,37 +202,15 @@ class App extends Component {
                         title={`${this.state.searchTime.format('LLL')} - ${this.state.currentFree} lediga.`}
                         showMenuIconButton={false}
                     />
-                    <Toolbar>
-                        <ToolbarGroup firstChild>
-                            <RaisedButton label="Reset" onTouchTap={this.resetAll.bind(this)} />
-                            <RaisedButton
-                                label="Föreg. lämpliga tid"
-                                onTouchTap={this.prevPossibleTime.bind(this)}
-                                primary
-                            />
-                            <RaisedButton
-                                label="Nästa lämpliga tid"
-                                onTouchTap={this.nextPossibleTime.bind(this)}
-                                primary
-                            />
-                            <TextField
-                                style={{width: '100px'}}
-                                hintText={'Minst antal deltagare'}
-                                errorText={this.state.errorMessage}
-                                onChange={this.filterOnNumber.bind(this)}
-                                value={this.state.minParticipants}
-                            />
-                            <Slider
-                                defaultValue={0}
-                                min={0}
-                                max={705}
-                                step={15}
-                                style={{width: '300px'}}
-                                value={this.state.setValue}
-                                onChange={this.changeTime.bind(this)}
-                            />
-                        </ToolbarGroup>
-                    </Toolbar>
+                    <MyToolbar
+                        minParticipants={this.state.minParticipants}
+                        errorMessage={this.state.errorMessage}
+                        prevPossibleTime={this.prevPossibleTime}
+                        nextPossibleTime={this.nextPossibleTime}
+                        filterOnNumber={this.filterOnNumber}
+                        resetAll={this.resetAll}
+                    />
+
                     <ul className="MainList">
                         {this.data.map(
                             (person, i) =>
