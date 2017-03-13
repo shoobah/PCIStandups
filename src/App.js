@@ -1,9 +1,9 @@
 import React, {Component} from 'react';
 import Moment from 'moment';
-import Scheme from './Scheme';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import AppBar from 'material-ui/AppBar';
 import MyToolbar from './MyToolbar';
+import Diagram from './Diagram';
 import './App.css';
 
 Moment.locale('sv');
@@ -211,21 +211,7 @@ class App extends Component {
                         filterOnNumber={this.filterOnNumber}
                         resetAll={this.resetAll}
                     />
-
-                    <ul className="MainList">
-                        {this.data.map(
-                            (person, i) =>
-                                person.ContractTimeMinutes > 0
-                                    ? <Scheme
-                                          isAvailable={this.isAvailable(person, this.state.searchTime)}
-                                          person={person}
-                                          key={`scheme-${i}`}
-                                          index={i}
-                                          searchTime={this.state.searchTime}
-                                      />
-                                    : null
-                        )}
-                    </ul>
+                    <Diagram data={this.data} isAvailable={this.isAvailable} searchTime={this.state.searchTime} />
                 </div>
             </MuiThemeProvider>
         );
