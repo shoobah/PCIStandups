@@ -8,3 +8,11 @@ The problem is to find a time slot when there is enough people at work and not o
 To find a solution to this, PCI has decided to engage one lonely consultant (guess who?). As a first step PCI wants a tool that based on the json object returned from the REST service, and an input on how many team members need to be present at the meeting, can find all suitable 15-minute intervals (possible start times are 00, 15, 30 and 45) for the daily stand-up.
 
 *) See  [example data](http://pizzacabininc.azurewebsites.net/PizzaCabinInc.svc/schedule/2015-12-14) for an example.
+
+# Installation
+1. Make sure you have nodejs and npm installed.
+1. run `npm install` in the project folder
+1. start application with `npm start`
+
+The application will try to start a server using port 3000.
+Browse to `http://localhost:3000`
