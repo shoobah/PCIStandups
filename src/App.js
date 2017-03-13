@@ -199,8 +199,7 @@ class App extends Component {
                         showMenuIconButton={false}
                     />
                     <MyToolbar
-                        minParticipants={this.state.minParticipants}
-                        errorMessage={this.state.errorMessage}
+                        {...this.state}
                         prevPossibleTime={this.prevPossibleTime}
                         nextPossibleTime={this.nextPossibleTime}
                         changeTime={this.changeTime}

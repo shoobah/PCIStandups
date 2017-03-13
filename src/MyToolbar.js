@@ -23,10 +23,11 @@ const MyToolbar = props => {
                     min={0}
                     max={705}
                     step={15}
-                    style={{width: '300px'}}
+                    style={{width: '300px', paddingTop: '23px'}}
                     value={props.setValue}
                     onChange={props.changeTime.bind(this)}
                 />
+                <span style={{paddingLeft: '20px'}}>{props.searchTime.format('LT')}</span>
             </ToolbarGroup>
         </Toolbar>
     );
